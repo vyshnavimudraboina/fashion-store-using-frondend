@@ -1,0 +1,61 @@
+
+const products = [
+  {
+    id: 1,
+    name: "Floral Summer Dress",
+    brand: "Zara",
+    category: "Women",
+    type: "Dress",
+    price: 1499,
+    color: "Pink",
+    size: ["S", "M", "L", "XL"],
+    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446",
+    description: "Beautiful floral summer dress for casual occasions.",
+    rating: 4.5,
+    stock: 20
+  },
+  {
+    id: 2,
+    name: "Men Casual Shirt",
+    brand: "H&M",
+    category: "Men",
+    type: "Shirt",
+    price: 999,
+    color: "Blue",
+    size: ["S", "M", "L", "XL"],
+    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c",
+    description: "Comfortable casual shirt for everyday wear.",
+    rating: 4.3,
+    stock: 15
+  },
+  {
+    id: 3,
+    name: "Women Handbag",
+    brand: "Gucci",
+    category: "Accessories",
+    type: "Handbag",
+    price: 2499,
+    color: "Black",
+    size: ["Free Size"],
+    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3",
+    description: "Stylish handbag for daily use and parties.",
+    rating: 4.7,
+    stock: 10
+  },
+  {
+    id: 4,
+    name: "Men Sneakers",
+    brand: "Nike",
+    category: "Footwear",
+    type: "Shoes",
+    price: 1999,
+    color: "White",
+    size: ["7", "8", "9", "10"],
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+    description: "Lightweight sneakers with comfortable cushioning.",
+    rating: 4.6,
+    stock: 25
+  }
+];
+
+export default products;
