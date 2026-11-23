@@ -20,6 +20,7 @@ function AddProduct() {
     size: ""
   });
 
+  // Handle input changes
   function handleChange(e) {
     const { name, value } = e.target;
 
@@ -29,6 +30,7 @@ function AddProduct() {
     });
   }
 
+  // Handle form submission
   function handleSubmit(e) {
     e.preventDefault();
 
@@ -164,3 +166,4 @@ function AddProduct() {
   );
 }
 
+export default AddProduct;
