@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import productsData from "../data/products";
+import productsData from "../data/Products.js";
 
 function AddProduct() {
   const navigate = useNavigate();
@@ -164,4 +164,3 @@ function AddProduct() {
   );
 }
 
-export default AddProduct;
