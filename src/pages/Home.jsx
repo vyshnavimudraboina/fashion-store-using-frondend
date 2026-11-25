@@ -44,18 +44,6 @@ function Home() {
       tagline: "Sneakers, Heels & Slides",
       image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
       query: "Footwear"
-    },
-    {
-      name: "Bags",
-      tagline: "Luxury Handbags & Totes",
-      image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80",
-      query: "Bags"
-    },
-    {
-      name: "Kids",
-      tagline: "Cute Outfits & Shoes",
-      image: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=600&q=80",
-      query: "Kids"
     }
   ];
 
@@ -121,7 +109,7 @@ function Home() {
             <div
               key={cat.name}
               className="category-card"
-              onClick={() => navigate(`/products`)}
+              onClick={() => navigate(cat.query ? `/products?category=${cat.query}` : `/products`)}
             >
               <img src={cat.image} alt={cat.name} className="category-card-image" />
               <div className="category-card-overlay">

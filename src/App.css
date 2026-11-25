@@ -477,22 +477,26 @@ button, input, select, textarea {
   color: var(--text-muted);
 }
 
-/* Category Grid */
+/* Category Grid (2-Column Layout) */
 .categories-showcase-section {
-  max-width: 1240px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
 }
 
 .category-card {
   position: relative;
-  height: 240px;
+  height: 280px;
+  width: 100%;
   border-radius: var(--radius-md);
   overflow: hidden;
   cursor: pointer;
@@ -523,25 +527,45 @@ button, input, select, textarea {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 16px;
+  padding: 20px 24px;
   color: white;
 }
 
 .category-card-overlay h3 {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 800;
+  margin: 0 0 4px;
+  color: #ffffff;
 }
 
 .category-card-overlay p {
-  font-size: 12px;
+  font-size: 13px;
   color: #cbd5e1;
-  margin: 2px 0 6px;
+  margin: 0 0 8px;
 }
 
 .cat-explore-btn {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #fbcfe8;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.category-card:hover .cat-explore-btn {
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .category-card {
+    height: 220px;
+  }
 }
 
 /* Trending Section */
