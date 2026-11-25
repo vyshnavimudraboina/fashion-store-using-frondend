@@ -10,6 +10,10 @@ import Logout from "../pages/Logout";
 import AddProduct from "../pages/AddProduct";
 import EditProduct from "../pages/EditProduct";
 import Wishlist from "../pages/Wishlist";
+import Cart from "../pages/Cart";
+import Checkout from "../pages/Checkout";
+import OrderSuccess from "../pages/OrderSuccess";
+import Orders from "../pages/Orders";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -22,7 +26,37 @@ function AppRoutes() {
 
       <Route path="/products/:id" element={<ProductDetails />} />
 
+      <Route path="/cart" element={<Cart />} />
+
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/order-success/:orderId"
+        element={
+          <ProtectedRoute>
+            <OrderSuccess />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/orders"
+        element={
+          <ProtectedRoute>
+            <Orders />
+          </ProtectedRoute>
+        }
+      />
+
       <Route path="/login" element={<Login />} />
+
 
       <Route path="/register" element={<Register />} />
 
@@ -33,7 +67,7 @@ function AppRoutes() {
       <Route
         path="/add-product"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute adminOnly={true}>
             <AddProduct />
           </ProtectedRoute>
         }
@@ -41,10 +75,16 @@ function AppRoutes() {
 
       <Route
         path="/edit-product/:id"
-        element={<EditProduct />}
+        element={
+          <ProtectedRoute adminOnly={true}>
+            <EditProduct />
+          </ProtectedRoute>
+        }
       />
     </Routes>
+
   );
 }
+
 
 export default AppRoutes;

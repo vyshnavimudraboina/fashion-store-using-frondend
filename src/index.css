@@ -16,29 +16,8 @@ a {
   text-decoration: none;
 }
 
-nav {
-  background: linear-gradient(135deg, #831843, #be185d);
-  padding: 20px 40px;
-  display: flex;
-  gap: 25px;
-  align-items: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-}
+/* Legacy styles reset */
 
-nav h2 {
-  color: white;
-  margin-right: auto;
-}
-
-nav > a {
-  color: white;
-  font-weight: 600;
-  transition: 0.3s;
-}
-
-nav > a:hover {
-  color: #fbcfe8;
-}
 
 main {
   width: 90%;

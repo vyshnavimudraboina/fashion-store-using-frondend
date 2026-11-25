@@ -8,9 +8,13 @@ function Logout() {
   useEffect(() => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("isAdmin");
 
     // Update Navbar login status
     window.dispatchEvent(new Event("authChange"));
+
 
     alert("Logout Successful!");
 
