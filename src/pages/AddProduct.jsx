@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import productsData from "../data/Products.js";
 
 function AddProduct() {
@@ -55,7 +56,7 @@ function AddProduct() {
       JSON.stringify(updatedProducts)
     );
 
-    alert("Product Added Successfully!");
+    toast.success("Product Added Successfully!");
 
     navigate("/products");
   }

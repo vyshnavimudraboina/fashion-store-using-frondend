@@ -1,6 +1,8 @@
+
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import productsData from "../data/Products.js";
 import { addToCart } from "../features/cartSlice";
 import { addWishlist, removeWishlist } from "../features/wishlistSlice";
@@ -13,7 +15,7 @@ function ProductDetails() {
 
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("M");
-  const [activeTab, setActiveTab] = useState("details"); // 'details' | 'specs' | 'delivery'
+  const [activeTab, setActiveTab] = useState("details");
 
   const wishlist = useSelector((state) => state.wishlist || []);
 
@@ -28,7 +30,9 @@ function ProductDetails() {
     return (
       <div className="empty-cart-card" style={{ margin: "60px auto" }}>
         <h2>Product Not Found</h2>
-        <p>The product you are looking for does not exist or has been removed.</p>
+        <p>
+          The product you are looking for does not exist or has been removed.
+        </p>
         <Link to="/products" className="shop-now-btn">
           Back to Collection
         </Link>
@@ -36,13 +40,24 @@ function ProductDetails() {
     );
   }
 
-  const isWishlisted = wishlist.some((item) => item.id === product.id);
-  const originalPrice = product.originalPrice || Math.round(product.price * 1.35);
-  const discountPercent = Math.round(((originalPrice - product.price) / originalPrice) * 100);
+  const isWishlisted = wishlist.some(
+    (item) => item.id === product.id
+  );
+
+  const originalPrice =
+    product.originalPrice || Math.round(product.price * 1.35);
+
+  const discountPercent = Math.round(
+    ((originalPrice - product.price) / originalPrice) * 100
+  );
 
   // Related products from same category
   const relatedProducts = savedProducts
-    .filter((item) => item.category === product.category && item.id !== product.id)
+    .filter(
+      (item) =>
+        item.category === product.category &&
+        item.id !== product.id
+    )
     .slice(0, 4);
 
   const handleAddToCart = () => {
@@ -53,13 +68,19 @@ function ProductDetails() {
         quantity
       })
     );
-    alert(`Added ${quantity} × "${product.name}" to cart! 🛒`);
+
+    toast.success(
+      `Added ${quantity} × "${product.name}" to cart! 🛒`
+    );
   };
 
   const handleBuyNow = () => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    const isLoggedIn =
+      localStorage.getItem("isLoggedIn") === "true";
+
     if (!isLoggedIn) {
-      alert("Please log in to place an order.");
+      toast.warning("Please log in to place an order.");
+
       navigate("/login", {
         state: {
           from: {
@@ -74,6 +95,7 @@ function ProductDetails() {
           }
         }
       });
+
       return;
     }
 
@@ -91,9 +113,10 @@ function ProductDetails() {
   const handleWishlistToggle = () => {
     if (isWishlisted) {
       dispatch(removeWishlist(product.id));
+      toast.info("Product removed from Wishlist!");
     } else {
       dispatch(addWishlist(product));
-      alert(`"${product.name}" added to Wishlist! ❤️`);
+      toast.success(`"${product.name}" added to Wishlist! ❤️`);
     }
   };
 
@@ -105,7 +128,9 @@ function ProductDetails() {
         <span>/</span>
         <Link to="/products">Products</Link>
         <span>/</span>
-        <Link to={`/products?category=${product.category}`}>{product.category}</Link>
+        <Link to={`/products?category=${product.category}`}>
+          {product.category}
+        </Link>
         <span>/</span>
         <span className="current-crumb">{product.name}</span>
       </nav>
@@ -116,54 +141,86 @@ function ProductDetails() {
         <div className="details-image-gallery">
           <div className="main-image-display">
             <img src={product.image} alt={product.name} />
-            {product.badge && <span className="details-badge-pill">{product.badge}</span>}
-            {discountPercent > 0 && <span className="details-discount-tag">-{discountPercent}% OFF</span>}
+
+            {product.badge && (
+              <span className="details-badge-pill">
+                {product.badge}
+              </span>
+            )}
+
+            {discountPercent > 0 && (
+              <span className="details-discount-tag">
+                -{discountPercent}% OFF
+              </span>
+            )}
           </div>
         </div>
 
         {/* Right Column: Information & Actions */}
         <div className="details-content-column">
           <div className="details-brand-rating-row">
-            <span className="details-brand-badge">{product.brand}</span>
+            <span className="details-brand-badge">
+              {product.brand}
+            </span>
+
             <span className="details-rating-badge">
-              ⭐ {product.rating || 4.5} ({product.reviewsCount || 48} reviews)
+              ⭐ {product.rating || 4.5} (
+              {product.reviewsCount || 48} reviews)
             </span>
           </div>
 
-          <h1 className="details-product-title">{product.name}</h1>
+          <h1 className="details-product-title">
+            {product.name}
+          </h1>
 
           <div className="details-pricing-block">
-            <span className="details-final-price">₹{product.price.toLocaleString("en-IN")}</span>
+            <span className="details-final-price">
+              ₹{product.price.toLocaleString("en-IN")}
+            </span>
+
             {originalPrice > product.price && (
-              <span className="details-original-price">₹{originalPrice.toLocaleString("en-IN")}</span>
+              <span className="details-original-price">
+                ₹{originalPrice.toLocaleString("en-IN")}
+              </span>
             )}
-            <span className="details-tax-note">Inclusive of all taxes</span>
+
+            <span className="details-tax-note">
+              Inclusive of all taxes
+            </span>
           </div>
 
           {/* Stock Indicator */}
           <div className="details-stock-status">
             {product.stock > 0 ? (
               <span className="stock-in">
-                🟢 In Stock & Ready to Ship ({product.stock} units available)
+                🟢 In Stock & Ready to Ship ({product.stock} units
+                available)
               </span>
             ) : (
-              <span className="stock-out">🔴 Out of Stock</span>
+              <span className="stock-out">
+                🔴 Out of Stock
+              </span>
             )}
           </div>
 
-          <p className="details-short-desc">{product.description}</p>
+          <p className="details-short-desc">
+            {product.description}
+          </p>
 
           {/* Size Selector */}
           <div className="details-option-group">
             <label className="option-label">
               <strong>Select Size:</strong>
             </label>
+
             <div className="size-selector-pills">
               {["XS", "S", "M", "L", "XL"].map((sz) => (
                 <button
                   key={sz}
                   type="button"
-                  className={`size-btn ${selectedSize === sz ? "active" : ""}`}
+                  className={`size-btn ${
+                    selectedSize === sz ? "active" : ""
+                  }`}
                   onClick={() => setSelectedSize(sz)}
                 >
                   {sz}
@@ -177,15 +234,20 @@ function ProductDetails() {
             <label className="option-label">
               <strong>Quantity:</strong>
             </label>
+
             <div className="qty-controls">
               <button
                 type="button"
                 className="qty-btn"
-                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                onClick={() =>
+                  setQuantity((prev) => Math.max(1, prev - 1))
+                }
               >
                 -
               </button>
+
               <span className="qty-count">{quantity}</span>
+
               <button
                 type="button"
                 className="qty-btn"
@@ -216,9 +278,15 @@ function ProductDetails() {
 
             <button
               type="button"
-              className={`details-wishlist-cta ${isWishlisted ? "active" : ""}`}
+              className={`details-wishlist-cta ${
+                isWishlisted ? "active" : ""
+              }`}
               onClick={handleWishlistToggle}
-              title={isWishlisted ? "Remove from Wishlist" : "Save to Wishlist"}
+              title={
+                isWishlisted
+                  ? "Remove from Wishlist"
+                  : "Save to Wishlist"
+              }
             >
               {isWishlisted ? "❤️ Saved" : "🤍 Wishlist"}
             </button>
@@ -229,21 +297,29 @@ function ProductDetails() {
             <div className="tabs-header">
               <button
                 type="button"
-                className={`tab-btn ${activeTab === "details" ? "active" : ""}`}
+                className={`tab-btn ${
+                  activeTab === "details" ? "active" : ""
+                }`}
                 onClick={() => setActiveTab("details")}
               >
                 Features
               </button>
+
               <button
                 type="button"
-                className={`tab-btn ${activeTab === "specs" ? "active" : ""}`}
+                className={`tab-btn ${
+                  activeTab === "specs" ? "active" : ""
+                }`}
                 onClick={() => setActiveTab("specs")}
               >
                 Specifications
               </button>
+
               <button
                 type="button"
-                className={`tab-btn ${activeTab === "delivery" ? "active" : ""}`}
+                className={`tab-btn ${
+                  activeTab === "delivery" ? "active" : ""
+                }`}
                 onClick={() => setActiveTab("delivery")}
               >
                 Delivery & Returns
@@ -254,10 +330,20 @@ function ProductDetails() {
               {activeTab === "details" && (
                 <div>
                   <p>{product.description}</p>
+
                   <ul className="details-bullets">
-                    <li>100% Genuine product authenticated by designer experts</li>
-                    <li>Premium breathable fabric tailored for durability and comfort</li>
-                    <li>Crafted with ethical environmental manufacturing standards</li>
+                    <li>
+                      100% Genuine product authenticated by designer
+                      experts
+                    </li>
+                    <li>
+                      Premium breathable fabric tailored for
+                      durability and comfort
+                    </li>
+                    <li>
+                      Crafted with ethical environmental
+                      manufacturing standards
+                    </li>
                   </ul>
                 </div>
               )}
@@ -268,18 +354,22 @@ function ProductDetails() {
                     <span>Brand</span>
                     <strong>{product.brand}</strong>
                   </div>
+
                   <div className="spec-row">
                     <span>Category</span>
                     <strong>{product.category}</strong>
                   </div>
+
                   <div className="spec-row">
                     <span>Type</span>
                     <strong>{product.type || "Fashion Wear"}</strong>
                   </div>
+
                   <div className="spec-row">
                     <span>Color</span>
                     <strong>{product.color || "Standard"}</strong>
                   </div>
+
                   <div className="spec-row">
                     <span>Care</span>
                     <strong>Dry Clean / Hand Wash Only</strong>
@@ -289,9 +379,20 @@ function ProductDetails() {
 
               {activeTab === "delivery" && (
                 <div>
-                  <p>🚚 <strong>Express Shipping:</strong> Delivered within 3-5 business days across India.</p>
-                  <p>📦 <strong>Free Shipping:</strong> On all orders above ₹999.</p>
-                  <p>🔄 <strong>7 Days Return Policy:</strong> Effortless doorstep returns & exchanges.</p>
+                  <p>
+                    🚚 <strong>Express Shipping:</strong> Delivered
+                    within 3-5 business days across India.
+                  </p>
+
+                  <p>
+                    📦 <strong>Free Shipping:</strong> On all orders
+                    above ₹999.
+                  </p>
+
+                  <p>
+                    🔄 <strong>7 Days Return Policy:</strong>{" "}
+                    Effortless doorstep returns & exchanges.
+                  </p>
                 </div>
               )}
             </div>
@@ -303,8 +404,13 @@ function ProductDetails() {
       {relatedProducts.length > 0 && (
         <section className="related-products-section">
           <div className="section-header-centered">
-            <span className="section-subtitle">Complete The Look</span>
-            <h2 className="section-title">Similar Styles You Might Love</h2>
+            <span className="section-subtitle">
+              Complete The Look
+            </span>
+
+            <h2 className="section-title">
+              Similar Styles You Might Love
+            </h2>
           </div>
 
           <div className="products-grid">

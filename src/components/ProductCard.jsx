@@ -1,7 +1,9 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addWishlist, removeWishlist } from "../features/wishlistSlice";
 import { addToCart } from "../features/cartSlice";
+import { toast } from "react-toastify";
 
 function ProductCard({ product }) {
   const dispatch = useDispatch();
@@ -13,8 +15,9 @@ function ProductCard({ product }) {
   const isAdmin = localStorage.getItem("userRole") === "admin";
 
   const originalPrice = product.originalPrice || Math.round(product.price * 1.35);
-  const discountPercent = Math.round(((originalPrice - product.price) / originalPrice) * 100);
-
+  const discountPercent = Math.round(
+    ((originalPrice - product.price) / originalPrice) * 100
+  );
 
   function handleDelete() {
     const confirmDelete = window.confirm(
@@ -30,6 +33,9 @@ function ProductCard({ product }) {
       );
 
       localStorage.setItem("products", JSON.stringify(updatedProducts));
+
+      toast.success("Product deleted successfully!");
+
       window.location.reload();
     }
   }
@@ -37,21 +43,24 @@ function ProductCard({ product }) {
   function handleWishlistToggle() {
     if (isWishlisted) {
       dispatch(removeWishlist(product.id));
+      toast.info(`"${product.name}" removed from Wishlist!`);
     } else {
       dispatch(addWishlist(product));
-      alert(`"${product.name}" added to Wishlist! ❤️`);
+      toast.success(`"${product.name}" added to Wishlist! ❤️`);
     }
   }
 
   function handleAddToCart() {
     dispatch(addToCart({ ...product, quantity: 1 }));
-    alert(`"${product.name}" added to cart! 🛒`);
+    toast.success(`"${product.name}" added to Cart! 🛒`);
   }
 
   function handleBuyNow() {
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
     if (!isLoggedIn) {
-      alert("Please log in to place an order.");
+      toast.warning("Please log in to place an order.");
+
       navigate("/login", {
         state: {
           from: {
@@ -103,7 +112,9 @@ function ProductCard({ product }) {
       <div className="card-body-content">
         <div className="card-meta-top">
           <span className="card-brand-tag">{product.brand}</span>
-          <span className="card-rating-tag">⭐ {product.rating || 4.5} ({product.reviewsCount || 48})</span>
+          <span className="card-rating-tag">
+            ⭐ {product.rating || 4.5} ({product.reviewsCount || 48})
+          </span>
         </div>
 
         <h3 className="card-product-title">
@@ -116,15 +127,20 @@ function ProductCard({ product }) {
           {product.size && <span> • Size: {product.size}</span>}
         </div>
 
-        {/* Pricing with Original Price & Savings */}
+        {/* Pricing */}
         <div className="card-pricing-row">
-          <span className="current-price">₹{product.price.toLocaleString("en-IN")}</span>
+          <span className="current-price">
+            ₹{product.price.toLocaleString("en-IN")}
+          </span>
+
           {originalPrice > product.price && (
-            <span className="strike-price">₹{originalPrice.toLocaleString("en-IN")}</span>
+            <span className="strike-price">
+              ₹{originalPrice.toLocaleString("en-IN")}
+            </span>
           )}
         </div>
 
-        {/* Primary Order & Cart Actions */}
+        {/* Cart & Buy Actions */}
         <div className="card-buy-actions-row">
           <button
             type="button"
@@ -143,7 +159,7 @@ function ProductCard({ product }) {
           </button>
         </div>
 
-        {/* Secondary Card Options: Admin gets Edit & Delete, regular users get View Details */}
+        {/* Secondary Actions */}
         <div className="card-secondary-actions">
           <Link
             to={`/products/${product.id}`}
@@ -173,7 +189,6 @@ function ProductCard({ product }) {
             </>
           )}
         </div>
-
       </div>
     </div>
   );

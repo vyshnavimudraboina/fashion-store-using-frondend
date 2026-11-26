@@ -1,6 +1,8 @@
+
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import { clearCart } from "../features/cartSlice";
 
 function Checkout() {
@@ -8,10 +10,8 @@ function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Support direct "Buy Now" item passed through navigation state, or fall back to cart items
   const directItem = location.state?.directItem;
   const cartItems = useSelector((state) => state.cart || []);
-
   const itemsToOrder = directItem ? [directItem] : cartItems;
 
   const [address, setAddress] = useState({
@@ -23,9 +23,8 @@ function Checkout() {
     pincode: ""
   });
 
-  const [paymentMethod, setPaymentMethod] = useState("card"); // 'card' | 'upi' | 'netbanking' | 'cod'
+  const [paymentMethod, setPaymentMethod] = useState("card");
 
-  // Card payment state
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
     cardHolder: "",
@@ -33,14 +32,11 @@ function Checkout() {
     cvv: ""
   });
 
-  // UPI payment state
-  const [upiMethod, setUpiMethod] = useState("gpay"); // 'gpay' | 'phonepe' | 'paytm' | 'id'
+  const [upiMethod, setUpiMethod] = useState("gpay");
   const [upiId, setUpiId] = useState("");
 
-  // Net banking state
   const [selectedBank, setSelectedBank] = useState("HDFC Bank");
 
-  // Processing state
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState("");
 
@@ -48,6 +44,7 @@ function Checkout() {
     (acc, item) => acc + (item.price || 0) * (item.quantity || 1),
     0
   );
+
   const shipping = subtotal > 999 || itemsToOrder.length === 0 ? 0 : 99;
   const totalAmount = subtotal + shipping;
 
@@ -57,26 +54,27 @@ function Checkout() {
 
   const handleCardNumberChange = (e) => {
     let value = e.target.value.replace(/\D/g, "").slice(0, 16);
-    // Format into groups of 4 digits
     const formatted = value.replace(/(\d{4})(?=\d)/g, "$1 ");
     setCardDetails({ ...cardDetails, cardNumber: formatted });
   };
 
   const handleExpiryChange = (e) => {
     let value = e.target.value.replace(/\D/g, "").slice(0, 4);
+
     if (value.length > 2) {
       value = `${value.slice(0, 2)}/${value.slice(2)}`;
     }
+
     setCardDetails({ ...cardDetails, expiry: value });
   };
 
   const handlePlaceOrder = (e) => {
     e.preventDefault();
 
-    // Check if user is logged in
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
     if (!isLoggedIn) {
-      alert("Please log in to place an order.");
+      toast.warning("Please log in to place an order.");
       navigate("/login", { state: { from: location } });
       return;
     }
@@ -90,48 +88,51 @@ function Checkout() {
       !address.state ||
       !address.pincode
     ) {
-      alert("Please fill in all shipping address fields.");
+      toast.error("Please fill in all shipping address fields.");
       return;
     }
 
-
     if (address.phone.trim().length < 10) {
-      alert("Please enter a valid 10-digit mobile number.");
+      toast.error("Please enter a valid 10-digit mobile number.");
       return;
     }
 
     if (address.pincode.trim().length !== 6) {
-      alert("Please enter a valid 6-digit PIN code.");
+      toast.error("Please enter a valid 6-digit PIN code.");
       return;
     }
 
-    // Validate Payment specific details
+    // Validate Payment Details
     if (paymentMethod === "card") {
       const cleanNum = cardDetails.cardNumber.replace(/\s/g, "");
+
       if (cleanNum.length < 16) {
-        alert("Please enter a valid 16-digit card number.");
+        toast.error("Please enter a valid 16-digit card number.");
         return;
       }
+
       if (!cardDetails.cardHolder.trim()) {
-        alert("Please enter cardholder name.");
+        toast.error("Please enter cardholder name.");
         return;
       }
+
       if (cardDetails.expiry.length < 5) {
-        alert("Please enter valid expiry date (MM/YY).");
+        toast.error("Please enter valid expiry date (MM/YY).");
         return;
       }
+
       if (cardDetails.cvv.length < 3) {
-        alert("Please enter valid 3-digit CVV.");
+        toast.error("Please enter valid 3-digit CVV.");
         return;
       }
     } else if (paymentMethod === "upi" && upiMethod === "id") {
       if (!upiId || !upiId.includes("@")) {
-        alert("Please enter a valid UPI ID (e.g., yourname@okhdfcbank).");
+        toast.error("Please enter a valid UPI ID (e.g., yourname@okhdfcbank).");
         return;
       }
     }
 
-    // Start simulated secure payment gateway processing
+    // Start simulated payment processing
     setIsProcessing(true);
     setProcessingStep("Connecting to secure payment gateway...");
 
@@ -144,10 +145,13 @@ function Checkout() {
     }, 1500);
 
     setTimeout(() => {
-      const orderId = `FS-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+      const orderId = `FS-${Date.now().toString().slice(-6)}-${Math.floor(
+        100 + Math.random() * 900
+      )}`;
 
       const deliveryDate = new Date();
       deliveryDate.setDate(deliveryDate.getDate() + 4);
+
       const deliveryFormatted = deliveryDate.toLocaleDateString("en-IN", {
         weekday: "short",
         day: "numeric",
@@ -178,18 +182,22 @@ function Checkout() {
         status: "Confirmed"
       };
 
-      // Save to localStorage
+      // Save order to localStorage
       const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
       existingOrders.unshift(orderData);
       localStorage.setItem("orders", JSON.stringify(existingOrders));
 
-      // If ordered from cart, clear cart
+      // Clear cart if order is from cart
       if (!directItem) {
         dispatch(clearCart());
       }
 
       setIsProcessing(false);
-      navigate(`/order-success/${orderId}`, { state: { order: orderData } });
+      toast.success("Order placed successfully! 🎉");
+
+      navigate(`/order-success/${orderId}`, {
+        state: { order: orderData }
+      });
     }, 2200);
   };
 
@@ -221,7 +229,6 @@ function Checkout() {
       <h1 className="page-title">Checkout & Payment</h1>
 
       <form onSubmit={handlePlaceOrder} className="checkout-layout">
-        {/* Left Column: Address & Payment Methods */}
         <div className="checkout-main-content">
           {/* Section 1: Shipping Address */}
           <div className="checkout-card">
@@ -322,7 +329,6 @@ function Checkout() {
               <span className="step-badge">2</span> Select Payment Method
             </h2>
 
-            {/* Payment Method Selector Tabs */}
             <div className="payment-tabs">
               <button
                 type="button"
@@ -331,6 +337,7 @@ function Checkout() {
               >
                 💳 Credit / Debit Card
               </button>
+
               <button
                 type="button"
                 className={`payment-tab-btn ${paymentMethod === "upi" ? "active" : ""}`}
@@ -338,6 +345,7 @@ function Checkout() {
               >
                 ⚡ UPI / QR
               </button>
+
               <button
                 type="button"
                 className={`payment-tab-btn ${paymentMethod === "netbanking" ? "active" : ""}`}
@@ -345,6 +353,7 @@ function Checkout() {
               >
                 🏦 Net Banking
               </button>
+
               <button
                 type="button"
                 className={`payment-tab-btn ${paymentMethod === "cod" ? "active" : ""}`}
@@ -354,7 +363,7 @@ function Checkout() {
               </button>
             </div>
 
-            {/* Tab 1: Card Details */}
+            {/* Card Details */}
             {paymentMethod === "card" && (
               <div className="payment-body">
                 <div className="card-mockup-banner">
@@ -380,7 +389,10 @@ function Checkout() {
                       placeholder="Name printed on card"
                       value={cardDetails.cardHolder}
                       onChange={(e) =>
-                        setCardDetails({ ...cardDetails, cardHolder: e.target.value })
+                        setCardDetails({
+                          ...cardDetails,
+                          cardHolder: e.target.value
+                        })
                       }
                     />
                   </div>
@@ -415,17 +427,16 @@ function Checkout() {
               </div>
             )}
 
-            {/* Tab 2: UPI */}
+            {/* UPI */}
             {paymentMethod === "upi" && (
               <div className="payment-body">
                 <p className="payment-subtitle">
-                  Choose your preferred UPI application or enter your Virtual Payment Address (VPA):
+                  Choose your preferred UPI application or enter your Virtual
+                  Payment Address (VPA):
                 </p>
 
                 <div className="upi-options-grid">
-                  <label
-                    className={`upi-radio-card ${upiMethod === "gpay" ? "selected" : ""}`}
-                  >
+                  <label className={`upi-radio-card ${upiMethod === "gpay" ? "selected" : ""}`}>
                     <input
                       type="radio"
                       name="upiMethod"
@@ -436,9 +447,7 @@ function Checkout() {
                     <span>Google Pay</span>
                   </label>
 
-                  <label
-                    className={`upi-radio-card ${upiMethod === "phonepe" ? "selected" : ""}`}
-                  >
+                  <label className={`upi-radio-card ${upiMethod === "phonepe" ? "selected" : ""}`}>
                     <input
                       type="radio"
                       name="upiMethod"
@@ -449,9 +458,7 @@ function Checkout() {
                     <span>PhonePe</span>
                   </label>
 
-                  <label
-                    className={`upi-radio-card ${upiMethod === "paytm" ? "selected" : ""}`}
-                  >
+                  <label className={`upi-radio-card ${upiMethod === "paytm" ? "selected" : ""}`}>
                     <input
                       type="radio"
                       name="upiMethod"
@@ -462,9 +469,7 @@ function Checkout() {
                     <span>Paytm UPI</span>
                   </label>
 
-                  <label
-                    className={`upi-radio-card ${upiMethod === "id" ? "selected" : ""}`}
-                  >
+                  <label className={`upi-radio-card ${upiMethod === "id" ? "selected" : ""}`}>
                     <input
                       type="radio"
                       name="upiMethod"
@@ -490,7 +495,7 @@ function Checkout() {
               </div>
             )}
 
-            {/* Tab 3: Net Banking */}
+            {/* Net Banking */}
             {paymentMethod === "netbanking" && (
               <div className="payment-body">
                 <p className="payment-subtitle">
@@ -516,7 +521,7 @@ function Checkout() {
               </div>
             )}
 
-            {/* Tab 4: Cash on Delivery */}
+            {/* Cash on Delivery */}
             {paymentMethod === "cod" && (
               <div className="payment-body">
                 <div className="cod-info-box">
@@ -524,7 +529,8 @@ function Checkout() {
                   <div>
                     <h4>Pay on Delivery (Cash / UPI)</h4>
                     <p>
-                      You can pay via Cash or UPI QR Code at your doorstep upon receiving the shipment.
+                      You can pay via Cash or UPI QR Code at your doorstep upon
+                      receiving the shipment.
                     </p>
                   </div>
                 </div>
@@ -533,7 +539,7 @@ function Checkout() {
           </div>
         </div>
 
-        {/* Right Column: Order Summary & Place Order Button */}
+        {/* Order Summary */}
         <div className="checkout-sidebar">
           <div className="summary-card">
             <h2>Order Items ({itemsToOrder.length})</h2>
@@ -545,11 +551,15 @@ function Checkout() {
                   <div className="checkout-item-meta">
                     <h4>{item.name}</h4>
                     <p>
-                      Qty: {item.quantity || 1} × ₹{item.price.toLocaleString("en-IN")}
+                      Qty: {item.quantity || 1} × ₹
+                      {item.price.toLocaleString("en-IN")}
                     </p>
                   </div>
                   <span className="checkout-item-price">
-                    ₹{((item.price || 0) * (item.quantity || 1)).toLocaleString("en-IN")}
+                    ₹
+                    {(
+                      (item.price || 0) * (item.quantity || 1)
+                    ).toLocaleString("en-IN")}
                   </span>
                 </div>
               ))}

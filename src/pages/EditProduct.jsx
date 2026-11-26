@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import productsData from "../data/Products";
 
 function EditProduct() {
@@ -52,7 +53,7 @@ function EditProduct() {
         stock: selectedProduct.stock ?? ""
       });
     } else {
-      alert("Product Not Found!");
+      toast.error("Product Not Found!");
       navigate("/products");
     }
   }, [id, navigate]);
@@ -104,7 +105,7 @@ function EditProduct() {
       JSON.stringify(updatedProducts)
     );
 
-    alert("Product Updated Successfully!");
+    toast.success("Product Updated Successfully!");
     navigate("/products");
   }
 

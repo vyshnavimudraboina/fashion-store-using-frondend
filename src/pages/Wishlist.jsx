@@ -1,5 +1,7 @@
+
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { removeWishlist } from "../features/wishlistSlice";
 import { addToCart } from "../features/cartSlice";
 
@@ -11,13 +13,15 @@ function Wishlist() {
   const handleMoveToCart = (product) => {
     dispatch(addToCart({ ...product, quantity: 1 }));
     dispatch(removeWishlist(product.id));
-    alert(`Moved "${product.name}" to your Cart! 🛒`);
+    toast.success(`"${product.name}" moved to your Cart! 🛒`);
   };
 
   const handleBuyNow = (product) => {
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
     if (!isLoggedIn) {
-      alert("Please log in to place an order.");
+      toast.warning("Please log in to place an order.");
+
       navigate("/login", {
         state: {
           from: {
@@ -32,6 +36,11 @@ function Wishlist() {
     navigate("/checkout", {
       state: { directItem: { ...product, quantity: 1 } }
     });
+  };
+
+  const handleRemove = (product) => {
+    dispatch(removeWishlist(product.id));
+    toast.info(`"${product.name}" removed from Wishlist!`);
   };
 
   return (
@@ -53,7 +62,10 @@ function Wishlist() {
         <div className="empty-cart-card">
           <div className="empty-cart-icon">💖</div>
           <h2>Your Wishlist is Empty</h2>
-          <p>Explore our fashion collection and tap the heart icon on your favorite items to save them here.</p>
+          <p>
+            Explore our fashion collection and tap the heart icon on your
+            favorite items to save them here.
+          </p>
           <Link to="/products" className="shop-now-btn">
             Explore Trending Fashion
           </Link>
@@ -61,7 +73,8 @@ function Wishlist() {
       ) : (
         <div className="wishlist-items-grid">
           {wishlist.map((product) => {
-            const originalPrice = product.originalPrice || Math.round(product.price * 1.35);
+            const originalPrice =
+              product.originalPrice || Math.round(product.price * 1.35);
 
             return (
               <div key={product.id} className="wishlist-card-enhanced">
@@ -69,10 +82,11 @@ function Wishlist() {
                   <Link to={`/products/${product.id}`}>
                     <img src={product.image} alt={product.name} />
                   </Link>
+
                   <button
                     type="button"
                     className="wishlist-remove-pill"
-                    onClick={() => dispatch(removeWishlist(product.id))}
+                    onClick={() => handleRemove(product)}
                     title="Remove item"
                   >
                     ✕
@@ -81,14 +95,22 @@ function Wishlist() {
 
                 <div className="wishlist-card-body">
                   <span className="card-brand-tag">{product.brand}</span>
+
                   <h3 className="wishlist-card-title">
-                    <Link to={`/products/${product.id}`}>{product.name}</Link>
+                    <Link to={`/products/${product.id}`}>
+                      {product.name}
+                    </Link>
                   </h3>
 
                   <div className="card-pricing-row">
-                    <span className="current-price">₹{product.price.toLocaleString("en-IN")}</span>
+                    <span className="current-price">
+                      ₹{product.price.toLocaleString("en-IN")}
+                    </span>
+
                     {originalPrice > product.price && (
-                      <span className="strike-price">₹{originalPrice.toLocaleString("en-IN")}</span>
+                      <span className="strike-price">
+                        ₹{originalPrice.toLocaleString("en-IN")}
+                      </span>
                     )}
                   </div>
 

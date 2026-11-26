@@ -1,5 +1,7 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Register() {
   const navigate = useNavigate();
@@ -29,7 +31,8 @@ function Register() {
     );
 
     if (existingUser) {
-      alert("Email already registered! Please log in.");
+      toast.error("Email already registered! Please log in.");
+
       navigate("/login");
       return;
     }
@@ -37,7 +40,8 @@ function Register() {
     users.push(user);
     localStorage.setItem("users", JSON.stringify(users));
 
-    alert("Registration Successful! Please log in with your credentials.");
+    toast.success("Registration Successful! Please log in.");
+
     navigate("/login");
   }
 
@@ -47,7 +51,9 @@ function Register() {
         <div className="auth-header">
           <span className="auth-icon">✨</span>
           <h1>Join Fashion Store</h1>
-          <p>Create an account to track deliveries, earn style rewards, and enjoy faster checkout.</p>
+          <p>
+            Create an account to track deliveries, earn style rewards, and enjoy faster checkout.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">

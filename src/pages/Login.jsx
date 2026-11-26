@@ -1,5 +1,7 @@
+
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Login() {
   const navigate = useNavigate();
@@ -15,15 +17,28 @@ function Login() {
       localStorage.getItem("users") || "[]"
     );
 
-    // Check if credentials match admin or normal users
     let loggedUser = null;
     let role = "user";
 
-    if (email.toLowerCase() === "admin@fashion.com" && (password === "admin123" || password.length >= 4)) {
-      loggedUser = { email: "admin@fashion.com", name: "Store Admin", role: "admin" };
+    if (
+      email.toLowerCase() === "admin@fashion.com" &&
+      (password === "admin123" || password.length >= 4)
+    ) {
+      loggedUser = {
+        email: "admin@fashion.com",
+        name: "Store Admin",
+        role: "admin"
+      };
       role = "admin";
-    } else if (email.toLowerCase() === "user@fashion.com" && (password === "user123" || password.length >= 4)) {
-      loggedUser = { email: "user@fashion.com", name: "Fashion Customer", role: "user" };
+    } else if (
+      email.toLowerCase() === "user@fashion.com" &&
+      (password === "user123" || password.length >= 4)
+    ) {
+      loggedUser = {
+        email: "user@fashion.com",
+        name: "Fashion Customer",
+        role: "user"
+      };
       role = "user";
     } else {
       const found = users.find(
@@ -31,35 +46,50 @@ function Login() {
           u.email.toLowerCase() === email.toLowerCase() &&
           u.password === password
       );
+
       if (found) {
         loggedUser = found;
-        role = found.role || (found.email.toLowerCase().includes("admin") ? "admin" : "user");
+        role =
+          found.role ||
+          (found.email.toLowerCase().includes("admin")
+            ? "admin"
+            : "user");
       }
     }
 
     if (loggedUser) {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userEmail", loggedUser.email);
-      localStorage.setItem("userName", loggedUser.name || (role === "admin" ? "Store Admin" : "Customer"));
+      localStorage.setItem(
+        "userName",
+        loggedUser.name ||
+          (role === "admin" ? "Store Admin" : "Customer")
+      );
       localStorage.setItem("userRole", role);
-      localStorage.setItem("isAdmin", role === "admin" ? "true" : "false");
-
-      // Update Navbar login status
-      window.dispatchEvent(new Event("authChange"));
-
-      alert(
-        role === "admin"
-          ? "Logged in as Administrator (Full access to Add, Edit, Delete products)."
-          : "Logged in as Customer (Browse, Cart & Buy products)."
+      localStorage.setItem(
+        "isAdmin",
+        role === "admin" ? "true" : "false"
       );
 
-      // Return to destination if came from protected route like /checkout
-      const destination = location.state?.from?.pathname || "/products";
+      window.dispatchEvent(new Event("authChange"));
+
+      toast.success(
+        role === "admin"
+          ? "Welcome Admin! Login Successful."
+          : "Welcome Customer! Login Successful."
+      );
+
+      const destination =
+        location.state?.from?.pathname || "/products";
+
       const targetState = location.state?.from?.state;
 
-      navigate(destination, { state: targetState, replace: true });
+      navigate(destination, {
+        state: targetState,
+        replace: true
+      });
     } else {
-      alert("Invalid Email or Password! You can use the Quick Demo buttons below to log in as Admin or Customer.");
+      toast.error("Invalid Email or Password!");
     }
   }
 
@@ -79,7 +109,9 @@ function Login() {
         <div className="auth-header">
           <span className="auth-icon">✨</span>
           <h1>Welcome Back</h1>
-          <p>Log in to access your orders, shopping cart, or manage products.</p>
+          <p>
+            Log in to access your orders, shopping cart, or manage products.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -127,7 +159,6 @@ function Login() {
             </button>
           </div>
         </form>
-
 
         <div className="auth-footer-prompt">
           <p>

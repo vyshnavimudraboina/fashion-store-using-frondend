@@ -1,6 +1,7 @@
 
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Logout() {
   const navigate = useNavigate();
@@ -15,9 +16,10 @@ function Logout() {
     // Update Navbar login status
     window.dispatchEvent(new Event("authChange"));
 
+    // Show success notification
+    toast.success("Logout Successful!");
 
-    alert("Logout Successful!");
-
+    // Navigate to Login page
     navigate("/login");
   }, [navigate]);
 
